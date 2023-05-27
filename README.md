@@ -19,12 +19,17 @@ The result of the division operation is an integer, the remainder is discarded.
 The result of the calculator with arabic numbers can be negative numbers and zero. The result of the calculator with Roman numbers can only be positive numbers, if the result is less than one, an exception is thrown.
 
 
+
 Here is an example of how a program works:
+
+
 Input:
 1 + 2
 
 Output:
 3
+
+
 
 Input:
 VI / III
@@ -32,11 +37,15 @@ VI / III
 Output:
 II
 
+
+
 Input:
 I - II
 
 Output:
 throws Exception //because there are no negative numbers in the Roman system
+
+
 
 Input:
 I + 1
@@ -44,11 +53,15 @@ I + 1
 Output:
 throws Exception //because different number systems are used simultaneously
 
+
+
 Input:
 1
 
 Output:
 throws Exception //because the string is not a mathematical operation
+
+
 
 Input:
 1 + 2 + 3
