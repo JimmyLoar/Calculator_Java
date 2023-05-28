@@ -4,7 +4,10 @@ import java.util.*;
 // cd /D E:\Docks\Godot Progects\Calculator_Java\
 
 class Main{
-	static boolean isDebug = false;
+	static enum ERR {
+		err_ok, err_noOperation, err_format, err_negativeNumbers, err_differentNumbers, err_arabicRange, err_romanRange
+	};
+	static boolean isDebug = true;
 	static String[] oparation_array = {"+", "-", "*", "/"};
     static int[] intervals={0, 1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
     static String[] numerals={"", "I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"};
@@ -36,9 +39,7 @@ class Main{
 
 		} catch(NullPointerException err){
 			debugPrint("throws Exception //err trim");
-			debugPrint("[error 0]:");
-			System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-			System.exit(0);
+			pushError(ERR.err_format);
 		};
 
 
@@ -48,9 +49,7 @@ class Main{
 
 
 		if (string_a == "" || string_b == "") {
-			debugPrint("[error 0]:");
-			System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-			System.exit(0);
+			pushError(ERR.err_format);
 		}
 
 		debugPrint(String.format("	str a = '%s'\n	str b = '%s'\n", string_a, string_b));
@@ -61,48 +60,47 @@ class Main{
 		var bIsArabic = b == -1;
 
 		if (aIsArabic){
+			try{Integer.valueOf(string_a);} 
+			catch (Exception e) {pushError(ERR.err_format);}
 			a = Integer.valueOf(string_a);
 		}	
 		if (bIsArabic){
+			try{Integer.valueOf(string_a);} 
+			catch (Exception e) {pushError(ERR.err_format);}
 			b = Integer.valueOf(string_b);
 		}
 
 		debugPrint(String.format("	a = %s\n	b = %s\n	op = %s\n", a, b, oparation));
 
 		if (aIsArabic != bIsArabic){
-			debugPrint("[error 1]:");
-			System.out.println("throws Exception //т.к. используются одновременно разные системы счисления");
-			System.exit(0);
+			pushError(ERR.err_differentNumbers);
 		}
 
 		else if (!aIsArabic) {
 			if (oparation == "-" && a < b) {
-				debugPrint("[error 2]:");
-				return "throws Exception //т.к. в римской системе нет отрицательных чисел";
+				pushError(ERR.err_negativeNumbers);
+
+
 			}
 			else if ((oparation == "/" || oparation == "*") && (a <= 0 || b <= 0)) {
-				debugPrint("[error 2]:");
-				return "throws Exception //т.к. в римской системе нет отрицательных чисел";
+				pushError(ERR.err_negativeNumbers);
+
 			}
 		}
 
 		if (a <= 0 || a > 10) {
 			if (aIsArabic) {
-				debugPrint("[error 3]:");
-				return "throws Exception //т.к. операнда 'a' выходят за приделы диапозона (0, 10)";
+				pushError(ERR.err_arabicRange);
 				
 			}
-			debugPrint("[error 3]:");
-			return "throws Exception //т.к. операнда 'a' выходят за приделы диапозона (I, X)";
+			pushError(ERR.err_romanRange);
 		}
 		else if (b <= 0 || b > 10) {
 			if (bIsArabic) {
-				debugPrint("[error 3]:");
-				return "throws Exception //т.к. операнда 'b' выходят за приделы диапозона (0, 10)";
+				pushError(ERR.err_arabicRange);
 				
 			}
-			debugPrint("[error 3]:");
-			return "throws Exception //т.к. операнда 'b' выходят за приделы диапозона (I, X)";
+			pushError(ERR.err_romanRange);
 		}
 		
 		int output = count(a, b, oparation);
@@ -117,6 +115,32 @@ class Main{
 		if (isDebug) {
 			System.out.println(text);
 		}
+	}
+
+
+	static void pushError(ERR error_type){
+		debugPrint(String.format("[error %s]", error_type));	
+		switch(error_type){
+		case err_format:
+			System.out.println("throws Exception //т.к. формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+			break;
+		case err_differentNumbers:
+			System.out.println("throws Exception //т.к. используются одновременно разные системы счисления");
+			break;
+		case err_negativeNumbers:
+			System.out.println("throws Exception //т.к. в римской системе нет отрицательных чисел");
+			break;
+		case err_arabicRange:
+			System.out.println("throws Exception //т.к. операнда 'a' выходят за приделы диапозона (0, 10)");
+			break;
+		case err_romanRange:
+			System.out.println("throws Exception //т.к. операнда 'a' выходят за приделы диапозона (I, X)");
+			break;
+		case err_noOperation:
+			System.out.println("throws Exception //т.к. строка не является математической операцией");
+			break;
+		};
+		System.exit(0);
 	}
 
 
@@ -145,9 +169,7 @@ class Main{
 			return new String[3];
 		}
 		else if (amount_op < 1) {
-			debugPrint("[error 4]:");
-			System.out.println("throws Exception //т.к. строка не является математической операцией");
-			System.exit(0);
+			pushError(ERR.err_noOperation);
 		}
 		return r_array;
 	};
